@@ -2,6 +2,7 @@ import React from 'react';
 import { shallow, ShallowWrapper } from 'enzyme';
 import Table, { TableProps, TableState } from './index';
 import * as Helpers from '../../Common/Helpers'
+import * as Styled from './styles'
 
 const data = {
   columnNames: ['col1', 'col2', 'col3'],
@@ -224,5 +225,28 @@ describe('Table component', () => {
     });
 
     // TODO: more onChange tests (remove row, remove col, etc)
+  });
+
+  it('shows hints if no data', () => {
+    const localWrapper: ShallowWrapper<TableProps, TableState, Table> = shallow(
+      <Table
+        onChange={onChange}
+        data={{
+          columnNames: [],
+          cells: []
+        }}
+      />
+    );
+
+    expect(localWrapper.find(Styled.Hint).first().dive().find('p')).toHaveLength(1)
+    expect(localWrapper.find(Styled.Hint).first().text()).toBe('No columns defined.')
+
+    expect(localWrapper.find(Styled.Hint).at(1).dive().find('p')).toHaveLength(1)
+    expect(localWrapper.find(Styled.Hint).at(1).text()).toBe('No rows defined.')
+  });
+
+  it('does not show hints if data defined', () => {
+    expect(wrapper.find(Styled.Hint).first().text()).toBe('')
+    expect(wrapper.find(Styled.Hint).at(1).text()).toBe('')
   });
 });
