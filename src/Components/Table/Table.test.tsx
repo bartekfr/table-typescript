@@ -1,6 +1,7 @@
 import React from 'react';
 import { shallow, ShallowWrapper } from 'enzyme';
 import Table, { TableProps, TableState } from './index';
+import * as Helpers from '../../Common/Helpers'
 
 const data = {
   columnNames: ['col1', 'col2', 'col3'],
@@ -13,37 +14,47 @@ const data = {
 
 describe('Table component', () => {
   let wrapper: ShallowWrapper<TableProps, TableState, Table>;
+  let instance: Table
   const onChange = jest.fn();
 
   beforeEach(() => {
-    // wrapper = shallow(<Table onChange={onChange} data={data} />);
+    wrapper = shallow(<Table onChange={onChange} data={data} />);
+    instance = wrapper.instance();
+    jest.spyOn(Helpers, 'insertItem')
+    jest.spyOn(Helpers, 'removeItem')
+    jest.spyOn(Helpers, 'updateItem')
+    jest.clearAllMocks()
   });
 
   it('adds row even if there are no columns', () => {
-    wrapper = shallow(<Table onChange={onChange} data={{
+    const localWrapper: ShallowWrapper<TableProps, TableState, Table> = shallow(<Table onChange={onChange} data={{
       columnNames: [],
       cells: []
     }} />);
-    const instance = wrapper.instance();
-    instance.addRow(0);
+    const localInstance = localWrapper.instance();
+    localInstance.addRow(0);
+    expect(Helpers.insertItem).toHaveBeenCalledTimes(1)
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith([], 0, [])
     // wrapper.update();
-    expect(wrapper.state('cells')).toEqual([
+    expect(localWrapper.state('cells')).toEqual([
       [],
     ]);
-    instance.addRow(0);
+    localInstance.addRow(0);
     // wrapper.update();
-    expect(wrapper.state('cells')).toEqual([
+    expect(Helpers.insertItem).toHaveBeenCalledTimes(2)
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith([[]], 0, [])
+    expect(localWrapper.state('cells')).toEqual([
       [],
       [],
     ]);
   });
 
   it('adds row', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     instance.addRow(1);
     // wrapper.update();
+    expect(Helpers.insertItem).toHaveBeenCalledTimes(1)
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith(data.cells, 1, ['', '', ''])
     expect(wrapper.state('cells')).toEqual([
       ['a1', 'a2', 'a3'],
       ['', '', ''],
@@ -53,6 +64,7 @@ describe('Table component', () => {
 
     instance.addRow(3);
     // wrapper.update();
+    expect(Helpers.insertItem).toHaveBeenCalledTimes(2)
     expect(wrapper.state('cells')).toEqual([
       ['a1', 'a2', 'a3'],
       ['', '', ''],
@@ -63,11 +75,11 @@ describe('Table component', () => {
   });
 
   it('removes row', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     instance.removeRow(1);
     // wrapper.update();
+    expect(Helpers.removeItem).toHaveBeenCalledTimes(1)
+    expect(Helpers.removeItem).toHaveBeenLastCalledWith(data.cells, 1)
     expect(wrapper.state('cells')).toEqual([
       ['a1', 'a2', 'a3'],
       ['c1', 'c2', 'c3'],
@@ -75,30 +87,34 @@ describe('Table component', () => {
 
     instance.removeRow(0);
     // wrapper.update();
+    expect(Helpers.removeItem).toHaveBeenCalledTimes(2)
+    expect(Helpers.removeItem).toHaveBeenLastCalledWith([
+      ['a1', 'a2', 'a3'],
+      ['c1', 'c2', 'c3'],
+    ], 0)
     expect(wrapper.state('cells')).toEqual([
       ['c1', 'c2', 'c3'],
     ]);
   });
 
   it('adds columns even if there are no rows', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
-    const instance = wrapper.instance();
+    const localWrapper: ShallowWrapper<TableProps, TableState, Table> = shallow(<Table onChange={onChange} data={{
+      columnNames: [],
+      cells: []
+    }} />);
+    const instance = localWrapper.instance();
     instance.addCol(0);
-    wrapper.update();
-    expect(wrapper.state('columnNames')).toEqual(['New column 1', ...data.columnNames]);
-    expect(wrapper.state('cells')).toEqual([
-      ['', 'a1', 'a2', 'a3'],
-      ['', 'b1', 'b2', 'b3'],
-      ['', 'c1', 'c2', 'c3'],
-    ]);
+    expect(Helpers.insertItem).toHaveBeenCalledTimes(1)
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith([], 0, 'New column 1')
+    expect(localWrapper.state('columnNames')).toEqual(['New column 1']);
+    expect(localWrapper.state('cells')).toEqual([]);
   });
 
   it('adds columns', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     instance.addCol(0);
     // wrapper.update();
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith(data.columnNames, 0, 'New column 1')
     expect(wrapper.state('cells')).toEqual([
       ['', 'a1', 'a2', 'a3'],
       ['', 'b1', 'b2', 'b3'],
@@ -108,6 +124,7 @@ describe('Table component', () => {
 
     instance.addCol(2);
     // wrapper.update();
+    expect(Helpers.insertItem).toHaveBeenLastCalledWith(['New column 1', ...data.columnNames], 2, 'New column 3')
     expect(wrapper.state('cells')).toEqual([
       ['', 'a1', '', 'a2', 'a3'],
       ['', 'b1', '', 'b2', 'b3'],
@@ -117,11 +134,11 @@ describe('Table component', () => {
   });
 
   it('removes col', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     instance.removeCol(1);
     // wrapper.update();
+    expect(Helpers.removeItem).toHaveBeenCalledTimes(data.cells.length + 1)
+    expect(Helpers.removeItem).toHaveBeenLastCalledWith(data.columnNames, 1)
     expect(wrapper.state('cells')).toEqual([
       ['a1', 'a3'],
       ['b1', 'b3'],
@@ -131,6 +148,7 @@ describe('Table component', () => {
 
     instance.removeCol(0);
     // wrapper.update();
+    expect(Helpers.removeItem).toHaveBeenLastCalledWith(['col1', 'col3'], 0)
     expect(wrapper.state('cells')).toEqual([
       ['a3'],
       ['b3'],
@@ -140,12 +158,12 @@ describe('Table component', () => {
   });
 
   it('updates data cell', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     const mockEvent = { target: { value: '45' } } as React.ChangeEvent<HTMLInputElement>
     instance.updateCell(1, 1, mockEvent);
     // wrapper.update();
+    expect(Helpers.updateItem).toHaveBeenCalledTimes(2)
+    expect(Helpers.updateItem).toHaveBeenLastCalledWith(data.cells, 1, ['b1', '45', 'b3'])
     expect(wrapper.state('cells')).toEqual([
       ['a1', 'a2', 'a3'],
       ['b1', '45', 'b3'],
@@ -154,19 +172,17 @@ describe('Table component', () => {
   });
 
   it('updates column name', () => {
-    wrapper = shallow(<Table onChange={onChange} data={data} />);
     // wrapper.update();
-    const instance = wrapper.instance();
     const mockEvent = { target: { value: 'New name' } } as React.ChangeEvent<HTMLInputElement>
     instance.updateColName(1,  mockEvent);
-    wrapper.update();
+    expect(Helpers.updateItem).toHaveBeenCalledTimes(1)
+    expect(Helpers.updateItem).toHaveBeenLastCalledWith(data.columnNames, 1, 'New name')
     expect(wrapper.state('columnNames')).toEqual(['col1', 'New name', 'col3']);
   });
 
   it('calls onChange prop', () => {
     onChange.mockClear();
     wrapper = shallow(<Table onChange={onChange} data={data} />);
-    const instance = wrapper.instance();
     // adding column
     instance.addCol(0);
     // wrapper.update();
