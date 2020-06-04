@@ -2,7 +2,6 @@ import PapaParse, { UnparseObject } from 'papaparse';
 import { saveAs } from 'file-saver';
 
 // Immutable array helpers
-// from https://redux.js.org/recipes/structuringreducers/immutableupdatepatterns
 export function insertItem<T = string>(array: T[], index: number, item: T) {
   const newArray: T[] = array.slice();
   newArray.splice(index, 0, item as T);

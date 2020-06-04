@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-// Table component
+
 const thColor2 = 'rgb(212, 212, 231)';
 const thColor1 = 'rgb(230, 235, 245)';
 
