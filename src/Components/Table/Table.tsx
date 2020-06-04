@@ -152,8 +152,8 @@ class Table extends React.Component<TableProps, TableState> {
             {/* Data Row  - END */}
           </tbody>
         </table>
-        <Styled.Hint>{!columnNames.length ? 'No columns defined.' : null }</Styled.Hint>
-        <Styled.Hint>{!cells.length ? 'No rows defined.' : null }</Styled.Hint>
+        <Styled.Hint alert>{!columnNames.length ? 'No columns defined.' : null }</Styled.Hint>
+        <Styled.Hint alert>{!cells.length ? 'No rows defined.' : null }</Styled.Hint>
         <ExportCSVBtn data={papaParseData} />
       </Styled.Table>
     );

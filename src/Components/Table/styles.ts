@@ -67,7 +67,7 @@ export const Table = styled.div`
       }
     }
 
-    &:not(:first-child) > th:first-child {
+    &:not(:first-child) > th:first-child:not(:hover) {
       background: ${thColor1};
     }
   }
@@ -106,8 +106,10 @@ export const Table = styled.div`
   }
 `
 
-export const Hint = styled.p`
-  color: #f00;
+export const Hint = styled.p<{
+  alert?: boolean
+}>`
+  color: ${props => props.alert ? '#f00' : '#ccc'};
   margin: 5px 0 0;
   padding: 0;
   font-size: 14px;
