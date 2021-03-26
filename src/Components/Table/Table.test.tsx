@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow, ShallowWrapper } from 'enzyme';
+import toJson from 'enzyme-to-json';
 import Table, { TableProps, TableState } from './index';
 import * as Helpers from '../../Common/Helpers'
 import * as Styled from './styles'
@@ -26,6 +27,10 @@ describe('Table component', () => {
     jest.spyOn(Helpers, 'updateItem')
     jest.clearAllMocks()
   });
+
+  it('matches initial snapshot', () => {
+    expect(toJson(wrapper)).toMatchSnapshot()
+  })
 
   it('adds row even if there are no columns', () => {
     const localWrapper: ShallowWrapper<TableProps, TableState, Table> = shallow(<Table onChange={onChange} data={{
