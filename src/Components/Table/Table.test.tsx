@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow, ShallowWrapper } from 'enzyme';
+import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import toJson from 'enzyme-to-json';
 import Table, { TableProps, TableState } from './index';
 import * as Helpers from '../../Common/Helpers'
@@ -31,6 +31,25 @@ describe('Table component', () => {
   it('matches initial snapshot', () => {
     expect(toJson(wrapper)).toMatchSnapshot()
   })
+
+  it('clicking add column buttons works', () => {
+    const localWrapper: ReactWrapper<TableProps, TableState, Table> = mount(<Table onChange={onChange} data={data} />);
+    const localInstance: Table = localWrapper.instance();
+    const addColMock = jest.spyOn(localInstance, 'addCol')
+    const addLeftColBtn = localWrapper.find('tr').at(0).find('th').at(2).find('button').first()
+    const addRightColBtn = localWrapper.find('tr').at(0).find('th').at(2).find('button').last()
+    // force re-render
+    // https://stackoverflow.com/a/55876524
+    localWrapper.setProps({})
+
+    addRightColBtn.simulate('click')
+    expect(localInstance.addCol).toHaveBeenLastCalledWith(2)
+
+    addLeftColBtn.simulate('click')
+    expect(localInstance.addCol).toHaveBeenLastCalledWith(1)
+
+    // TODO: add tests for other buttons
+  });
 
   it('adds row even if there are no columns', () => {
     const localWrapper: ShallowWrapper<TableProps, TableState, Table> = shallow(<Table onChange={onChange} data={{
@@ -187,7 +206,6 @@ describe('Table component', () => {
   });
 
   it('calls onChange prop', () => {
-    onChange.mockClear();
     wrapper = shallow(<Table onChange={onChange} data={data} />);
     // adding column
     instance.addCol(0);
