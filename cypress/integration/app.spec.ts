@@ -32,4 +32,20 @@ describe('App test', () => {
     cy.get('tr:first-child th').should('have.length', columnsLength)
     cy.get(`tr:first-child th:nth-child(${baseColumnCssIndex}) input`).should('have.value', 'New column 2')
   })
+
+  it('Edits cells', () => {
+    cy.get('tr:nth-child(2) td:nth-child(2) input').type('xyz{enter}')
+    cy.get('tr:nth-child(2) td:nth-child(2) input').should('have.value', 'xyz')
+
+    cy.get('tr:nth-child(3) td:nth-child(3) input').type('abc{enter}')
+    cy.get('tr:nth-child(3) td:nth-child(3) input').should('have.value', 'abc')
+
+
+    cy.get('tr:nth-child(3) td:nth-child(4) input')
+      .should('have.value', 'b1')
+      .type('abc{selectAll}{del}')
+      .should('have.value', '')
+      .type('tyui{enter}')
+      .should('have.value', 'tyui')
+  })
 })
