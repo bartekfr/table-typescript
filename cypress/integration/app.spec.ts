@@ -52,9 +52,22 @@ describe('App test', () => {
 
     cy.get('tr:nth-child(3) td:nth-child(4) input')
       .should('have.value', 'b1')
-      .type('abc{selectAll}{del}')
+      .type('{selectAll}{del}')
       .should('have.value', '')
       .type('tyui{enter}')
       .should('have.value', 'tyui')
+
+    // columns headings
+    cy.get('tr:nth-child(1) th:nth-child(4) input')
+      .should('have.value', 'col 1')
+      .type('{selectAll}{del}')
+      .should('have.value', '')
+      .type('ColTest{enter}')
+      .should('have.value', 'ColTest')
+
+    cy.get('tr:nth-child(1) th:last-child input')
+      .should('have.value', 'col 2')
+      .type('{selectAll}{del}ColTest{enter}')
+      .should('have.value', 'ColTest')
   })
 })
