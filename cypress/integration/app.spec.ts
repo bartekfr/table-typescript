@@ -36,6 +36,40 @@ describe('App test', () => {
     cy.get(`tr:first-child th:nth-child(${baseColumnCssIndex}) input`).should('have.value', 'New column 2')
   })
 
+
+  it('Adds rows', () => {
+    let expectedRowsLength = 3
+    // add column
+    cy.get('tr:first-child th:first-child div:last-child button:last-child')
+      .click({ force: true })
+    expectedRowsLength++
+
+    cy.get('tr').should('have.length', expectedRowsLength)
+    cy.get('tr:nth-child(2) td input').each((cell) => {
+      cy.wrap(cell).should('have.value', '')
+    })
+
+    // add column
+    cy.get('tr:nth-child(3) th:first-child div:last-child button:last-child')
+      .click({ force: true })
+    expectedRowsLength++
+
+    cy.get('tr').should('have.length', expectedRowsLength)
+    cy.get('tr:nth-child(4) td input').each((cell) => {
+      cy.wrap(cell).should('have.value', '')
+    })
+
+    // add column
+    cy.get('tr:nth-child(3) th:first-child div:last-child button:first-child')
+      .click({ force: true })
+    expectedRowsLength++
+
+    cy.get('tr').should('have.length', expectedRowsLength)
+    cy.get('tr:nth-child(2) td input').each((cell) => {
+      cy.wrap(cell).should('have.value', '')
+    })
+  })
+
   it('Edits cells', () => {
     cy.get('tr:nth-child(2) td:nth-child(2) input')
       .should('have.value', '')
@@ -50,12 +84,17 @@ describe('App test', () => {
         .should('have.value', 'abc')
     })
 
-    cy.get('tr:nth-child(3) td:nth-child(4) input')
+    cy.get('tr:nth-child(6) td:nth-child(4) input')
       .should('have.value', 'b1')
       .type('{selectAll}{del}')
       .should('have.value', '')
       .type('tyui{enter}')
       .should('have.value', 'tyui')
+
+    cy.get('tr:nth-child(3) td:nth-child(3) input')
+      .should('have.value', 'abc')
+      .type('def{enter}')
+      .should('have.value', 'abcdef')
 
     // columns headings
     cy.get('tr:nth-child(1) th:nth-child(4) input')
