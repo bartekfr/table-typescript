@@ -77,7 +77,7 @@ describe('App test', () => {
       .should('have.value', 'xyz')
 
     // just play with `within`
-    cy.get('tr:nth-child(3) td:nth-child(3) input').within(($cellInput) => {
+    cy.get('tr:nth-child(3) td:nth-of-type(2) input').within(($cellInput) => {
       cy.wrap($cellInput)
         .should('have.value', '')
         .type('abc{enter}')
@@ -108,5 +108,40 @@ describe('App test', () => {
       .should('have.value', 'col 2')
       .type('{selectAll}{del}ColTest{enter}')
       .should('have.value', 'ColTest')
+  })
+
+  it('Deletes columns', () => {
+    let expectedColumnsLength = 6
+    cy.get('tr:first-child th:nth-child(2) input').should('have.value', 'New column 1')
+    cy.get('tr:first-child th:nth-child(2) div:first-child button:nth-child(2)')
+      .click({ force: true })
+
+    expectedColumnsLength--
+    cy.get('tr:first-child th').should('have.length', expectedColumnsLength)
+    cy.get('tr:first-child th:nth-child(2) input').should('have.value', 'New column 2')
+
+    cy.get('tr:first-child th:last-child input').should('have.value', 'ColTest')
+    cy.get('tr:first-child th:last-child div:first-child button:nth-child(2)')
+      .click({ force: true })
+
+    expectedColumnsLength--
+    cy.get('tr:first-child th').should('have.length', expectedColumnsLength)
+    cy.get('tr:first-child th:last-child input').should('have.value', 'New column 3')
+  })
+
+  it('Deletes rows', () => {
+    let expectedRowsLength = 6
+    cy.get('tr').should('have.length', expectedRowsLength)
+    cy.get('tr:nth-child(4) td:nth-of-type(2) input').should('have.value', 'a1')
+    cy.get('tr:nth-child(3) th').contains('2')
+    cy.get('input[value="abcdef"]').as('cell')
+    cy.get('tr:nth-child(3) th div:first-child button:nth-child(2)')
+      .click({ force: true })
+
+    expectedRowsLength--
+    cy.get('tr').should('have.length', expectedRowsLength)
+    cy.get('tr:nth-child(3) td:nth-of-type(2) input').should('have.value', 'a1')
+    cy.get('input[value="abcdef"]').should('not.exist')
+
   })
 })
