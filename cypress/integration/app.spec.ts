@@ -6,6 +6,11 @@ describe('App test', () => {
     cy.get('tr').eq(0).find('th').should('have.length', 3)
   })
 
+  it('Renders export button', () => {
+
+    cy.contains('save as csv', { matchCase: false }).should('match', 'button')
+  })
+
   it('Adds columns', () => {
     let expectedColumnsLength = 3
     // Add new column
