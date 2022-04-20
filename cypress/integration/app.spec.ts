@@ -118,8 +118,11 @@ describe('App test', () => {
   it('Deletes columns', () => {
     let expectedColumnsLength = 6
     cy.get('tr:first-child th:nth-child(2) input').should('have.value', 'New column 1')
-    cy.get('tr:first-child th:nth-child(2) div:first-child button:nth-child(2)')
-      .click({ force: true })
+
+    cy.get('tr:first-child th:nth-child(2) div:first-child')
+      .invoke('show')
+      .find('button:nth-child(2)')
+      .click()
 
     expectedColumnsLength--
     cy.get('tr:first-child th').should('have.length', expectedColumnsLength)
